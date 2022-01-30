@@ -8,7 +8,7 @@ def parse_arguments(known=False):
     parser.add_argument("--file", type=str, default="points.txt", help="where to save the points")
     parser.add_argument("--lbound", type=float, default=0, help="lower bound of the distribution")
     parser.add_argument("--ubound", type=float, default=10, help="upper bound of the distribution")
-    parser.add_argument("--round", type=bool, store_action=True, help="round the points")
+    parser.add_argument("--round", action="store_true", help="round the points")
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
@@ -22,10 +22,9 @@ if __name__ == "__main__":
     l_bound = opt_parser.lbound
     u_bound = opt_parser.ubound
     round_points = opt_parser.round
-    save = opt_parser.save
 
     # create points
-    points = np.random.uniform(l_bound, u_bound, (n_points, 2))
+    points = np.round(np.random.uniform(l_bound, u_bound, (n_points, 2)), 5)
     if round_points:
         points = np.round(points, 2)
 
