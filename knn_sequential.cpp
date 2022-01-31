@@ -46,7 +46,7 @@ int main(int argc, char* argv[])  {
     }
     {
         utimer knn_write("The writing part was");
-        ofstream datafile("knn_sequential_" + to_string(points.size()) + "_" + to_string(k) + ".txt");
+        ofstream datafile("knn_sequential_" + to_string(points.size()/1000) + "k_" + to_string(k) + ".txt");
         datafile << knn_results; //write results to file
     }
 }

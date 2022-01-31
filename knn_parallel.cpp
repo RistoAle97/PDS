@@ -61,7 +61,7 @@ int main(int argc, char* argv[])  {
     }
     {
         utimer knn_write("The writing part was");
-        ofstream datafile("knn_parallel_" + to_string(points.size()) + "_" + to_string(k) + ".txt");
+        ofstream datafile("knn_parallel_" + to_string(points.size()/1000) + "k_" + to_string(k) + "_" + to_string(nw) +  ".txt");
         for (auto &thread_results: thread_outputs) {
             datafile << thread_results; //write results to file
         }
