@@ -41,7 +41,7 @@ inline string build_results(priority_queue<pair<int, float>, vector<pair<int, fl
     while (!top_k.empty()) {
         pair<int, float> point = top_k.top();
         top_k.pop();
-        knn_results.append("<" + to_string(point.first) + ", " + to_string(point.second) + "> ");
+        knn_results.append("(" + to_string(point.first) + ", " + to_string(point.second) + ") ");
     }
     knn_results.append("\n");
     return knn_results;
