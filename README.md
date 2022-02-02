@@ -18,10 +18,17 @@ Compile with ```make```, then run the following commands as you prefer:
 ```
 ### parallel implementation (stdlib threads)
 ```
-./knn_parallel datasets/points_dataset.txt workers
+./knn_parallel datasets/points_dataset.txt n_workers
 ```
 ### fastflow implementation
 ```
-./knn_ff datasets/points_dataset.txt workers
+./knn_ff datasets/points_dataset.txt n_workers
 ```
-The results will be saved in the corresponding directory with the name knn_implementation_points_workers.txt.
+The results will be saved with the name knn_implementation_points_workers.txt.
+
+### run more versions with one method
+If you want to run more versions at the same time for more runs use the following command:
+```
+python --file datasets/points_10k.txt --k 10 --nw 256 --runs 10 --execute spf
+```
+The last argument determines which versions to run (s for sequential, p for parallel and f for fastflow), then you can use knn_plot.py to plot the results (beware that you need to manually change them).
