@@ -1,0 +1,22 @@
+\section{Running the project}
+To build everything needed to test the project you can make use of the Makefile just by typing \textit{make} once you have extracted the zip file.
+\vspace{3mm}
+
+Afterwards, you can generate datasets of points with \textit{generate\_points.py} using it in the following way (it will create 10000 points by using a uniform distribution between 0 and 10 if no arguments are passed):
+\begin{minted}[fontsize=\small, bgcolor=gray!30]{bash}
+python generate_points.py --n 100000 --file datasets/points.txt
+\end{minted}
+
+Then you can run every implementation easily, the following are just examples:
+\begin{minted}[fontsize=\small, bgcolor=gray!30]{bash}
+./knn_sequential datasets/points.txt 10
+./knn_parallel datasets/points.txt 10 256
+./knn_ff datasets/points.txt 10 256
+\end{minted}
+
+For each implementation the second argument is the value of k, meanwhile the third argument, for both stdlib threads and FastFlow implementations, is the number of workers.
+If you want to execute more times the same implementation or to execute more than one at time, use the \textit{compute\_knn.py} method:
+\begin{minted}[fontsize=\small, bgcolor=gray!30]{bash}
+python --file datasets/points_10k.txt --k 10 --nw 256 --runs 10 --execute spf
+\end{minted}
+The last argument specifies what versions to run (s for sequential, p for parallel and f for FastFlow).

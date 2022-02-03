@@ -1,0 +1,53 @@
+\documentclass[11pt, letterpaper]{article}  % change to >11 pt if you like, and change article with report
+\usepackage[letterpaper, top=3.71cm, bottom=3.20cm, left=2.86cm, right=2.86cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{subfig}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{minted}
+%\usepackage{algorithmic}
+%\usepackage{algpseudocode}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage[table, dvipsnames]{xcolor}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\newcommand{\dash}{{-}}%
+
+\title{\vspace{-2cm}\textbf{Parallel and Distributed Systems project report\\K-Nearest Neighbours}}
+\author{\textbf{\small{\textit{Ristori Alessandro}}} \\ % put your full name here
+        \small{Master Degree in Computer science.}\\ \small{{a.ristori5@studenti.unipi.it, 619618}} \\  % put your Master Degree here
+        \small{Parallel and Distributed Systems, Academic Year: 2020/2021} \\
+        \small{Date: 3/02/2022} \\
+       %\textbf{\small{\url{https://github.com/RistoAle97/PDS}}}
+}
+
+\renewcommand\refname{} %remove this line to automatically show the bibliography header
+
+\begin{document}
+\nocite{*}  % comment this line to list only the articles you really cite
+\date{}
+\maketitle
+\begin{center}
+    \includegraphics[width=0.45\textwidth]{images/unipi.png}\\
+    \vspace{0.5cm}
+\end{center}
+\thispagestyle{empty}
+\newpage
+%\thispagestyle{empty}
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+%\listoffigures
+%\newpage
+\pagenumbering{arabic}
+\input{chapters/introduction}
+\input{chapters/implementation}
+\input{chapters/results}
+\input{chapters/conclusions}
+\input{chapters/run}
+\include{chapters/references}
+\end{document}

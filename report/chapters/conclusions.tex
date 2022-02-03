@@ -1,0 +1,12 @@
+\section{Improvements}
+Meanwhile I was working on the project many other solutions or improvements came to my mind that at the end were not implemented for various reasons, in this subsection i will explain some of them.
+\vspace{3mm}
+
+\subsection{Parallelize everything}
+First, is possibile to parallelize both the outer loop and first inner loop from \autoref{algorithm:knn}, however this comes with the price that the threads working on the inner loop have to insert or remove points from the priority queue by "communicating" with the others, this implies an higher overhead.
+I could also parallelize the reading and writing part but since their cost was small with respect to the KNN computation I thought that it would not have any major improvement.
+\vspace{3mm}
+
+\subsection{Compute more efficiently the distances}
+Then it is possible to compute the distances by calculating the upper or lower triangular distance matrix, but even this solution comes with an higher overhead since a thread would need to access two priority queues at the same time (for two different points i and j) and one of them could be accessed at the same instant by another thread (this is the same "communication" problem as before). Moreover the computation of the distances in this way has the same cost of my solution, $O(n^2)$, so it was discarded right away.
+\vspace{3mm}

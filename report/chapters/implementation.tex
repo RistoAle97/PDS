@@ -1,0 +1,96 @@
+\section{Implementation}
+In this section I'll discuss of the main implementation choices taken during the development of the project by also giving an overview on the method itself.
+
+\subsection{KNN overview}\label{subsec:knn_overview}
+Before we dive into the heart of the section we need to contestualize KNN inside the project. KNN is a perfect example of \textbf{Data Parallel problem} and, more precisely, an \textbf{embarassingly parallel} one, because the \textbf{computation of a subtask is independent to the others}, therefore those subtasks don't need any kind of communication or synchronization.
+The task can be summarized as the composition of three major steps:
+\begin{itemize}
+    \item \textbf{Read all the points} on a 2d space from a file.
+    \item\textbf{Compute KNN}.
+    \item \textbf{Write results} on file.
+\end{itemize}
+Without a doubt the most computationally expensive and interesting part is the second one, which I will talk more about on \autoref{subsec:seq_implementation}.
+
+\subsection{Sequential implementation}\label{subsec:seq_implementation}
+As I said at the end of \autoref{sec:introduction}, the project required two different versions of the same task, one using C++ threads from stdlib and one using FastFlow, but both share the same main structure and, therefore, I thought that it would be useful to show it in \autoref{algorithm:knn} (which is the sequential version of KNN method) in order to better understand how it works.
+
+\SetKwInput{KwInput}{Input}
+\SetKwInput{KwOutput}{Output} 
+\begin{algorithm}[H]
+    \caption{KNN sequential}
+    \label{algorithm:knn}
+    \KwInput{txt file containing a pair of coordinates for each row representing the points, the index of a point is the row on which such pair is located and the value of k}
+    \KwOutput{string which will be written on a file where the i-th row is in the following format: $point_{i}: <neigh\_id_{1}, distance_{i1}>, ... <neigh\_id_{n}, distance_{in}>$}
+    \textbf{Read points} from file and store them into \textit{points}\\
+    \textbf{Priority queue} knn\\
+    \textbf{String} knn\_results\\
+    \For{point i in points} {
+        \For{points j in points} {
+            \If{$i==j$} {
+                continue
+            }
+            calculate \textit{d(i, j)}\\
+            \If{$knn.size()<k$} {
+                knn.emplace(point[j])
+            }\ElseIf{$d(i,j)<knn.top()$} {
+                knn.pop()\\
+                knn.emplace(point[j])
+            }
+        }
+        \While{$!knn.empty()$} {
+            p = knn.pop()\\
+            knn\_results.append(to\_string(p))
+        }
+    }
+    \textbf{Write knn\_results} to file
+\end{algorithm}
+The main choice was to \textbf{keep a single priority queue globally} with \textit{k} as its dimension, which is emptied at the end of the first inner loop in order to write the results in the final output string, this is surely better than keeping as much priority queues as the number of points, which would have been a serious waste of space the more the latter went up.
+\vspace{3mm}
+
+Moreover, the priority queue was preferred since it can retrieve istantly (i.e.: with constant cost) the most distant point in the structure so the only thing that has a notable cost is the reestablishment of the priority condition which is $O(log(k))$, way better than $O(klog(k))$ that would have taken by ordering a normal array of \textit{k} points.
+\vspace{3mm}
+
+\subsubsection{Sequential cost}
+The total cost of the first inner loop is given by the cost of computing distances, $O(n)$, and the cost to mantain the priority condition for a complexity of $O(nlog(k))$, this part of the method will be known as \textit{knn} and its completion time will be $T_{knn}$ from now on; at the same time, the building of the ouptut string has cost $O(klog(k))$ and its completion time will be known as $T_{BuildString}$, so the final cost of the KNN computation is:
+\begin{center}
+\begin{Large}
+$O(n(nlog(k)+klog(k)))=O(n^2log(k)+nklog(k))=O(n^2log(k))$
+\end{Large}
+\end{center}
+
+The previous statement holds always true if $k<<n$, which is the case of this project; we can now define the completion time of the sequential version as:
+
+\begin{center}
+\begin{Large}
+$T_{seq}=T_{Read}+n(T_{knn}+T_{BuildString})+T_{Write}$
+\end{Large}
+\end{center}
+where $n$ is the number of points, $T_{knn}$ is the time spent on finding the \textit{k} closest points and $T_{BuildString}$ is the time spent to build the output string. $T_{Read}$ and $T_{Write}$ are autoexplicative and they represent the \textbf{serial part} of the source code.
+
+\subsection{Parallel implementations}\label{subsec:par_implementations}
+As required from the project, I developed two more implementations of KNN, one using C++ threads and the other using the FastFlow library.
+\subsubsection{C++ threads}
+The parallel implementation with threads from the standard library of C++ is straightforward since it is nearly the same as the sequential one with some tweaks. Each thread has assigned the same number of points in an extremely easy way, given $nw$ as the number of workers. the \textbf{workload} is defined as $\frac{n}{nw}$ and the \textbf{excess amount of work} as $n\%nw$ which needs to be redistributed between the threads, so at maximum we need to redistribute $nw-1$ of excess workload and, since $nw<<n$, this is highly negligible with respect to the KNN computation.
+\vspace{3mm}
+
+\textbf{Each thread knows where its partition starts and ends} given its workload and id, therefore the threads work on their partition at the same time just like a \textit{Map} template.
+Moreover, \textbf{each thread returns a string} (just like for the sequential implementation) which is saved in an array in position $i$ that corresponds to the thread id and at the end the results are written on the output file by combining one string at time, like in a \textit{Reduce} fashion.
+\vspace{3mm}
+
+The only cons from this implementation come from the \textbf{increased number of priority queues}, which is now the same as the number of threads, and the \textbf{overhead cost} since we need to split and merge the work.
+
+\subsubsection{FastFlow}
+\textbf{The fastflow implementation is nearly identical to the C++ threads one} and even simpler since I did not need to load balance the workload manually. I opted to use a \textbf{ParallelForReduce} since it works in the same way as I did for the stdlib threads version (i.e.: a Map followed by a Reduce, keep in mind that in this way the Map's collector is substituted by the Reduce).
+
+\subsubsection{Parallel cost}
+\textbf{Both C++ threads and FastFlow implementations rely on \autoref{algorithm:knn}}, so their cost is similar but, since the outer loop can be done in parallel now, the weight of the main argument that contributes the most (i.e.: $n(T_{knn}+T_{BuildString})$ is now divided by the number of workers.
+\vspace{3mm}
+
+Even though the weight of the most expensive part is alleviated, \textbf{the cost coming from the task subdivision and final merge should be taken into account as pure overhead} $T_{ov}=T_{Split}+T_{Reduce}$. Hence, the total cost of the parallel implementations can be defined as:
+
+\begin{center}
+\begin{Large}
+$T_{par}(nw)=T_{Read}+nwT_{ov}+\frac{n(T_{knn}+T_{BuildString})}{nw}+T_{Write}$
+\end{Large}
+\end{center}
+Where $nw$ is the number of workers or, more technically speaking, the \textbf{parallelism degree} and everything else was the same as discussed during the sequential version.

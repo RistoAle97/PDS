@@ -1,0 +1,5 @@
+\section{Introduction}\label{sec:introduction}
+The K-Nearest Neighbours is a well known classification method used to classify datapoints given their spatial representation without the complexity of models such Neural Networks. A point is classified in a determined class by a majority vote of its \textit{k} neighbours, where \textit{k} is an hyperparameter and the only one that KNN needs.
+\vspace{3mm}
+
+The aim of the project was not a classification task or to learn the best value of \textit{k}, but to find the nearest \textit{k} neighbours for all the points in a 2d space and writing the results into another file. The input dataset is composed by pairs of coordinates which represents the points, the output file contains an ordered list for each point with their \textit{k} nearest neighbours ordered by distance. Moreover, the main purpose of the project was to find a way to parallelize this modified version of KNN with both C++ standard library threads and FastFlow library.
