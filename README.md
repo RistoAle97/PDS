@@ -32,3 +32,9 @@ If you want to run more versions at the same time for more runs use the followin
 python --file datasets/points_10k.txt --k 10 --nw 256 --runs 10 --execute spf
 ```
 The last argument determines which versions to run (s for sequential, p for parallel and f for fastflow), then you can use knn_plot.py to plot the results (beware that you need to manually change them).
+## Plot results
+To plot the results use ```knn_plot.py``` in the following way:
+```
+python knn_plot.py --s --scalab --e --exectime --compare
+```
+You can choose which kind of metrics to plot by typing ```--s``` for the speedup, ```--scalab``` for the scalability, ```e``` for efficiency and ```--exectime``` for the execution time. Then you can also ```--compare``` to plot the comparison for the metrics chosen before.
