@@ -23,7 +23,7 @@ int main(int argc, char* argv[])  {
         utimer knn_read("The reading part was");
         points = read_points_file(argv[1]); //fill the points by reading them from a file
     }
-    
+
     //check if k is not bigger than the number of points
     if (k>=points.size()) {
         cout << "WARNING: the value of k must be smaller than the number of points, KNN will be executed with k=sqrt(n)" << endl;
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])  {
     string knn_results;
     {
         utimer knn_sequential("KNN fastflow was");
-        string identity;
+        string identity; //needed for the parallel_for_reduce
         parallel_reduce(knn_results, identity, 0, long(points.size()), 1, 0, [&](const int i, string& local_result) {
             priority_queue<pair<int, float>, vector<pair<int, float>>, decltype(comparison)> top_k(comparison);
             knn_distances(ref(top_k), i, ref(points), k);
